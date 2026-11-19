@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Generator Kartu Ujian V3 - Madrasah & Sekolah</title>
+    <title>Aplikasi Generator Kartu Ujian V3 - MTs & MA</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Font Awesome Icons -->
@@ -45,9 +45,9 @@
             background: #64748b;
         }
 
-        /* Ukuran Kartu Presisi Standar Plastik ID Card / Nametag: 10.5cm x 7.5cm */
+        /* Ukuran Kartu Presisi Dikalibrasi untuk Kertas A4 (210mm) & F4 (215mm) agar tidak terpotong */
         .exam-card {
-            width: 105mm;
+            width: 99mm;
             height: 75mm;
             background: #ffffff;
             border: 1.5px solid #1e293b;
@@ -57,7 +57,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 3.5mm 4mm;
+            padding: 3mm 3.5mm;
             page-break-inside: avoid;
             break-inside: avoid;
         }
@@ -72,9 +72,10 @@
             background: white;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             margin: 0 auto 24px auto;
-            padding: 8mm;
+            padding: 5mm 4mm;
+            box-sizing: border-box;
             display: grid;
-            grid-template-columns: repeat(2, 105mm);
+            grid-template-columns: repeat(2, 99mm);
             gap: 3mm;
             justify-content: center;
             align-content: start;
@@ -93,7 +94,8 @@
         /* Pengaturan Khusus Saat Dicetak (CTRL+P / Tombol Cetak) */
         @media print {
             @page {
-                margin: 5mm;
+                size: A4 portrait;
+                margin: 4mm;
             }
             body {
                 background: #ffffff !important;
@@ -117,7 +119,7 @@
                 box-shadow: none !important;
                 margin: 0 auto !important;
                 padding: 2mm 0 !important;
-                width: 100% !important;
+                width: 202mm !important;
                 min-height: auto !important;
                 page-break-after: always;
                 break-after: page;
@@ -134,7 +136,7 @@
 </head>
 <body class="text-slate-800 antialiased">
 
-    <!-- Toast Notification Container (Pengganti alert) -->
+    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 no-print"></div>
 
     <!-- Modal Tambah/Edit Siswa Manual -->
@@ -175,7 +177,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Kelas / Rombel *</label>
-                        <input type="text" id="m-kelas" required placeholder="Contoh: IX-A" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <input type="text" id="m-kelas" required placeholder="Contoh: IX-A / XII IPA-1" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Ruang Ujian *</label>
@@ -200,15 +202,25 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="font-extrabold text-base sm:text-lg tracking-tight">Generator Kartu Ujian</h1>
-                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-900 rounded-full">V3 Pro</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-900 rounded-full">V3 MTs & MA</span>
                     </div>
                     <p class="text-xs text-emerald-100 flex items-center gap-1.5">
-                        <i class="fa-solid fa-shield-halved text-emerald-300"></i> 100% Client-Side • Presisi 10,5 x 7,5 cm • Ekstrak ZIP Massal
+                        <i class="fa-solid fa-shield-halved text-emerald-300"></i> Mendukung MTs & MA • Presisi 10,5 x 7,5 cm • Ekstrak ZIP Massal
                     </p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
+                <!-- Pilihan Cepat Jenjang MTs & MA -->
+                <div class="flex items-center bg-emerald-950/60 rounded-xl p-1 border border-emerald-500/40 text-xs">
+                    <button onclick="applyJenjangPreset('MTS', true)" id="btn-jenjang-mts" class="px-3 py-1.5 rounded-lg font-extrabold bg-amber-400 text-slate-950 shadow-sm transition">
+                        Mode MTs
+                    </button>
+                    <button onclick="applyJenjangPreset('MA', true)" id="btn-jenjang-ma" class="px-3 py-1.5 rounded-lg font-bold text-emerald-100 hover:text-white transition">
+                        Mode MA
+                    </button>
+                </div>
+
                 <!-- Pilihan Ukuran Kertas -->
                 <div class="flex items-center bg-emerald-900/60 rounded-xl p-1 border border-emerald-600/50 text-xs">
                     <button onclick="setPaperSize('A4')" id="btn-paper-a4" class="px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-900 shadow-sm transition">
@@ -286,13 +298,13 @@
                             </button>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Gunakan template Excel bawaan agar kolom <b>No Peserta, NISN, Nama, TTL, Kelas, Ruang</b> terbaca otomatis.
+                            Gunakan template Excel bawaan agar kolom <b>No Peserta, NISN, Nama, TTL, Kelas, Ruang</b> terbaca otomatis (mendukung MTs & MA).
                         </p>
                         <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-emerald-400 rounded-xl bg-white hover:bg-emerald-50/50 cursor-pointer transition group">
                             <div class="flex flex-col items-center justify-center pt-2 pb-2 text-center px-3">
                                 <i class="fa-solid fa-file-excel text-2xl text-emerald-600 group-hover:scale-110 transition mb-1"></i>
                                 <p class="text-xs font-bold text-slate-700">Klik untuk Upload File Excel (.xlsx / .xls)</p>
-                                <p id="excel-status" class="text-[11px] text-slate-400 mt-0.5">Menggunakan 4 data contoh bawaan</p>
+                                <p id="excel-status" class="text-[11px] text-slate-400 mt-0.5">Menggunakan data contoh jenjang aktif</p>
                             </div>
                             <input type="file" id="upload-excel" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelUpload(event)">
                         </label>
@@ -354,6 +366,21 @@
                 <!-- ================= TAB 2: KOP SURAT & TEMA ================= -->
                 <div id="tab-panel-kop" class="space-y-4 hidden">
                     
+                    <!-- Preset Cepat Jenjang Khusus MTs & MA -->
+                    <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 space-y-2">
+                        <p class="text-[11px] font-extrabold text-emerald-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i> Pilih Preset Jenjang Madrasah:
+                        </p>
+                        <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+                            <button type="button" onclick="applyJenjangPreset('MTS', true)" class="py-2 px-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white border border-emerald-700 transition shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-mosque"></i> MTs (Tsanawiyah)
+                            </button>
+                            <button type="button" onclick="applyJenjangPreset('MA', true)" class="py-2 px-3 rounded-lg bg-blue-800 hover:bg-blue-900 text-white border border-blue-800 transition shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-graduation-cap"></i> MA (Aliyah)
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Dual Logo Upload -->
                     <div class="grid grid-cols-2 gap-3">
                         <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 text-center space-y-2">
@@ -400,7 +427,7 @@
                         <div class="grid grid-cols-2 gap-2.5">
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">Judul Kartu Ujian</label>
-                                <input type="text" id="cfg-judul" oninput="updateConfig()" value="KARTU PESERTA ASESMEN MADRASAH" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-emerald-500 focus:outline-none">
+                                <input type="text" id="cfg-judul" oninput="updateConfig()" value="KARTU PESERTA ASESMEN MADRASAH (AM)" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-emerald-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">Tahun Pelajaran</label>
@@ -529,7 +556,10 @@
         // 1. STATE & KONFIGURASI UTAMA APLIKASI
         // ==========================================
         let paperSize = 'A4'; // 'A4' (6 kartu/lembar) atau 'F4' (8 kartu/lembar)
+        let currentJenjang = 'MTS'; // 'MTS' atau 'MA'
         let activeSinglePhotoNisn = null;
+        let hasCustomUploadedData = false;
+        const STORAGE_KEY = 'kartu_ujian_v3_mts_ma_project';
 
         // Data SVG Default (Logo & TTD Contoh agar langsung terlihat rapi saat dibuka)
         const defaultLogoLeft = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,5 90,27 90,73 50,95 10,73 10,27" fill="#065f46" stroke="#fbbf24" stroke-width="4"/><circle cx="50" cy="50" r="22" fill="#fbbf24"/><text x="50" y="56" font-family="Arial" font-size="16" font-weight="bold" fill="#065f46" text-anchor="middle">KEMENAG</text></svg>`);
@@ -541,7 +571,7 @@
             instansi: "KEMENTERIAN AGAMA REPUBLIK INDONESIA",
             sekolah: "MADRASAH TSANAWIYAH NEGERI 1 NUSANTARA",
             alamat: "Jl. Pendidikan Raya No. 45, Kota Nusantara • Telp. (021) 555-0192",
-            judul: "KARTU PESERTA ASESMEN MADRASAH",
+            judul: "KARTU PESERTA ASESMEN MADRASAH (AM)",
             tapel: "TAHUN PELAJARAN 2025/2026",
             accentColor: "#065f46",
             tgl: "Nusantara, 12 Mei 2026",
@@ -555,51 +585,116 @@
             stempelImg: defaultStempelSvg
         };
 
-        // Penyimpanan Foto Berbasis NISN (Key: NISN string bersih -> Value: ObjectURL / DataURL)
+        // Penyimpanan Foto Berbasis NISN
         const photoMap = {};
 
-        // Data Contoh Awal (4 Peserta)
-        let students = [
-            { nopes: "01-001-001-8", nisn: "0091234501", nis: "23001", nama: "MUHAMMAD RIZKY PRATAMA", ttl: "Jakarta, 14 Maret 2010", kelas: "IX-A", ruang: "Ruang 01" },
-            { nopes: "01-001-002-7", nisn: "0091234502", nis: "23002", nama: "AISYAH PUTRI RAMADHANI", ttl: "Bandung, 22 Agustus 2010", kelas: "IX-A", ruang: "Ruang 01" },
-            { nopes: "01-001-003-6", nisn: "0091234503", nis: "23003", nama: "FAJAR NUGROHO SAPUTRA", ttl: "Surabaya, 05 Januari 2010", kelas: "IX-B", ruang: "Ruang 02" },
-            { nopes: "01-001-004-5", nisn: "0091234504", nis: "23004", nama: "ZAHRA SALSABILA KHAIRUNNISA", ttl: "Yogyakarta, 19 November 2010", kelas: "IX-B", ruang: "Ruang 02" }
+        // Data Contoh Jenjang MTs
+        const sampleStudentsMTS = [
+            { nopes: "02-001-001-8", nisn: "0091234501", nis: "23001", nama: "MUHAMMAD RIZKY PRATAMA", ttl: "Jakarta, 14 Maret 2011", kelas: "IX-A", ruang: "Ruang 01" },
+            { nopes: "02-001-002-7", nisn: "0091234502", nis: "23002", nama: "AISYAH PUTRI RAMADHANI", ttl: "Bandung, 22 Agustus 2011", kelas: "IX-A", ruang: "Ruang 01" },
+            { nopes: "02-001-003-6", nisn: "0091234503", nis: "23003", nama: "FAJAR NUGROHO SAPUTRA", ttl: "Surabaya, 05 Januari 2011", kelas: "IX-B", ruang: "Ruang 02" },
+            { nopes: "02-001-004-5", nisn: "0091234504", nis: "23004", nama: "ZAHRA SALSABILA KHAIRUNNISA", ttl: "Yogyakarta, 19 November 2011", kelas: "IX-B", ruang: "Ruang 02" }
         ];
 
-        // ==========================================
-        // 2. INISIALISASI SAAT HALAMAN DIMUAT
-        // ==========================================
-        const STORAGE_KEY = 'kartu_ujian_v3_saved_project';
+        // Data Contoh Jenjang MA
+        const sampleStudentsMA = [
+            { nopes: "03-001-001-8", nisn: "0071234501", nis: "22101", nama: "AHMAD ZAKI AL-FATIH", ttl: "Semarang, 10 Februari 2008", kelas: "XII IPA-1", ruang: "Ruang 01" },
+            { nopes: "03-001-002-7", nisn: "0071234502", nis: "22102", nama: "FATIMAH AZ-ZAHRA", ttl: "Malang, 18 Juli 2008", kelas: "XII IPA-1", ruang: "Ruang 01" },
+            { nopes: "03-001-003-6", nisn: "0071234503", nis: "22103", nama: "MUHAMMAD FARHAN HAKIM", ttl: "Medan, 29 Oktober 2008", kelas: "XII IPS-1", ruang: "Ruang 02" },
+            { nopes: "03-001-004-5", nisn: "0071234504", nis: "22104", nama: "NAYLA SYIFA KAMILA", ttl: "Makassar, 03 April 2008", kelas: "XII AGAMA", ruang: "Ruang 02" }
+        ];
 
-        window.onload = function() {
-            loadProjectFromLocal();
+        // Daftar Peserta Aktif
+        let students = JSON.parse(JSON.stringify(sampleStudentsMTS));
+
+        // ==========================================
+        // 2. PRESET JENJANG KHUSUS MTS & MA
+        // ==========================================
+        function updateJenjangButtonsUI() {
+            const btnMts = document.getElementById('btn-jenjang-mts');
+            const btnMa = document.getElementById('btn-jenjang-ma');
+            if (!btnMts || !btnMa) return;
+
+            if (currentJenjang === 'MA') {
+                btnMa.className = "px-3 py-1.5 rounded-lg font-extrabold bg-amber-400 text-slate-950 shadow-sm transition";
+                btnMts.className = "px-3 py-1.5 rounded-lg font-bold text-emerald-100 hover:text-white transition";
+            } else {
+                btnMts.className = "px-3 py-1.5 rounded-lg font-extrabold bg-amber-400 text-slate-950 shadow-sm transition";
+                btnMa.className = "px-3 py-1.5 rounded-lg font-bold text-emerald-100 hover:text-white transition";
+            }
+        }
+
+        function applyJenjangPreset(jenjang, switchSampleData = false) {
+            const presets = {
+                MTS: {
+                    instansi: "KEMENTERIAN AGAMA REPUBLIK INDONESIA",
+                    sekolah: "MADRASAH TSANAWIYAH NEGERI 1 NUSANTARA",
+                    judul: "KARTU PESERTA ASESMEN MADRASAH (AM)",
+                    jabatan: "Kepala Madrasah,",
+                    accentColor: "#065f46"
+                },
+                MA: {
+                    instansi: "KEMENTERIAN AGAMA REPUBLIK INDONESIA",
+                    sekolah: "MADRASAH ALIYAH NEGERI 1 NUSANTARA",
+                    judul: "KARTU PESERTA ASESMEN MADRASAH (AM)",
+                    jabatan: "Kepala Madrasah,",
+                    accentColor: "#1e3a8a"
+                }
+            };
+
+            const normalizedJenjang = jenjang === 'MA' ? 'MA' : 'MTS';
+            const p = presets[normalizedJenjang];
+
+            currentJenjang = normalizedJenjang;
+            config.instansi = p.instansi;
+            config.sekolah = p.sekolah;
+            config.judul = p.judul;
+            config.jabatan = p.jabatan;
+            config.accentColor = p.accentColor;
+
+            // Ganti data contoh otomatis jika belum upload Excel sendiri
+            if (switchSampleData && !hasCustomUploadedData) {
+                students = normalizedJenjang === 'MA'
+                    ? JSON.parse(JSON.stringify(sampleStudentsMA))
+                    : JSON.parse(JSON.stringify(sampleStudentsMTS));
+                updateClassFilterOptions();
+                updatePhotoMatchBadge();
+            }
+
             syncFormWithConfig();
-            syncImagePreviews();
-            updateClassFilterOptions();
+            updateJenjangButtonsUI();
             renderAll();
-        };
+            showToast(`Format Kartu Ujian berhasil diatur ke jenjang ${normalizedJenjang}!`, "success");
+        }
 
         // ==========================================
-        // 2B. FITUR SIMPAN & MUAT PROYEK (LOCALSTORAGE + JSON)
+        // 3. FITUR SIMPAN & MUAT PROYEK (LOCALSTORAGE + JSON)
         // ==========================================
         function syncFormWithConfig() {
-            document.getElementById('cfg-instansi').value = config.instansi;
-            document.getElementById('cfg-sekolah').value = config.sekolah;
-            document.getElementById('cfg-alamat').value = config.alamat;
-            document.getElementById('cfg-judul').value = config.judul;
-            document.getElementById('cfg-tapel').value = config.tapel;
-            document.getElementById('cfg-color').value = config.accentColor;
-            document.getElementById('cfg-tgl').value = config.tgl;
-            document.getElementById('cfg-jabatan').value = config.jabatan;
-            document.getElementById('cfg-kamad').value = config.kamad;
-            document.getElementById('cfg-nip').value = config.nip;
-            document.getElementById('cfg-catatan').value = config.catatan;
+            const fields = {
+                'cfg-instansi': config.instansi,
+                'cfg-sekolah': config.sekolah,
+                'cfg-alamat': config.alamat,
+                'cfg-judul': config.judul,
+                'cfg-tapel': config.tapel,
+                'cfg-color': config.accentColor,
+                'cfg-tgl': config.tgl,
+                'cfg-jabatan': config.jabatan,
+                'cfg-kamad': config.kamad,
+                'cfg-nip': config.nip,
+                'cfg-catatan': config.catatan
+            };
+            Object.keys(fields).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = fields[id] || '';
+            });
         }
 
         function saveProjectToLocal() {
             try {
                 const payload = {
                     savedAt: new Date().toISOString(),
+                    currentJenjang: currentJenjang,
                     paperSize: paperSize,
                     config: config,
                     students: students
@@ -607,7 +702,7 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
                 showToast("Pengaturan kop, TTD & daftar peserta berhasil disimpan!", "success");
             } catch (err) {
-                showToast("Gagal menyimpan ke penyimpanan browser (ukuran gambar terlalu besar). Gunakan tombol Unduh Cadangan (.json).", "warning");
+                showToast("Gagal menyimpan ke penyimpanan browser. Gunakan tombol Unduh Cadangan (.json).", "warning");
                 console.error(err);
             }
         }
@@ -617,9 +712,28 @@
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (!raw) return;
                 const saved = JSON.parse(raw);
+                if (saved.currentJenjang) currentJenjang = saved.currentJenjang;
                 if (saved.config) Object.assign(config, saved.config);
-                if (Array.isArray(saved.students)) students = saved.students;
-                if (saved.paperSize) setPaperSize(saved.paperSize);
+                if (Array.isArray(saved.students)) {
+                    students = saved.students;
+                    hasCustomUploadedData = true;
+                }
+                if (saved.paperSize) {
+                    paperSize = saved.paperSize === 'F4' ? 'F4' : 'A4';
+                    const btnA4 = document.getElementById('btn-paper-a4');
+                    const btnF4 = document.getElementById('btn-paper-f4');
+                    const label = document.getElementById('print-paper-label');
+                    if (btnA4 && btnF4) {
+                        if (paperSize === 'A4') {
+                            btnA4.className = "px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-900 shadow-sm transition";
+                            btnF4.className = "px-3 py-1.5 rounded-lg font-semibold text-emerald-100 hover:text-white transition";
+                        } else {
+                            btnF4.className = "px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-900 shadow-sm transition";
+                            btnA4.className = "px-3 py-1.5 rounded-lg font-semibold text-emerald-100 hover:text-white transition";
+                        }
+                    }
+                    if (label) label.textContent = paperSize;
+                }
             } catch (err) {
                 console.error("Gagal memuat data tersimpan:", err);
             }
@@ -628,8 +742,9 @@
         function exportProjectFile() {
             try {
                 const payload = {
-                    app: "Generator Kartu Ujian V3",
+                    app: "Generator Kartu Ujian V3 MTs & MA",
                     exportedAt: new Date().toISOString(),
+                    currentJenjang: currentJenjang,
                     paperSize: paperSize,
                     config: config,
                     students: students
@@ -638,7 +753,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Backup_Kartu_Ujian_${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `Backup_Kartu_Ujian_${currentJenjang}_${new Date().toISOString().slice(0, 10)}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
                 showToast("File cadangan proyek (.json) berhasil diunduh!", "success");
@@ -655,12 +770,17 @@
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
+                    if (imported.currentJenjang) currentJenjang = imported.currentJenjang;
                     if (imported.config) Object.assign(config, imported.config);
-                    if (Array.isArray(imported.students)) students = imported.students;
+                    if (Array.isArray(imported.students)) {
+                        students = imported.students;
+                        hasCustomUploadedData = true;
+                    }
                     if (imported.paperSize) setPaperSize(imported.paperSize);
 
                     syncFormWithConfig();
                     syncImagePreviews();
+                    updateJenjangButtonsUI();
                     updateClassFilterOptions();
                     updatePhotoMatchBadge();
                     renderAll();
@@ -675,7 +795,7 @@
         }
 
         // ==========================================
-        // 3. NAVIGASI TAB, UKURAN KERTAS, CETAK & TOAST
+        // 4. NAVIGASI TAB, UKURAN KERTAS, CETAK & PDF
         // ==========================================
         function switchTab(tabName) {
             const tabs = ['data', 'kop', 'ttd'];
@@ -702,12 +822,14 @@
             const btnF4 = document.getElementById('btn-paper-f4');
             const label = document.getElementById('print-paper-label');
 
-            if (paperSize === 'A4') {
-                btnA4.className = "px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-900 shadow-sm transition";
-                btnF4.className = "px-3 py-1.5 rounded-lg font-semibold text-emerald-100 hover:text-white transition";
-            } else {
-                btnF4.className = "px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-900 shadow-sm transition";
-                btnA4.className = "px-3 py-1.5 rounded-lg font-semibold text-emerald-100 hover:text-white transition";
+            if (btnA4 && btnF4) {
+                if (paperSize === 'A4') {
+                    btnA4.className = "px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-900 shadow-sm transition";
+                    btnF4.className = "px-3 py-1.5 rounded-lg font-semibold text-emerald-100 hover:text-white transition";
+                } else {
+                    btnF4.className = "px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-900 shadow-sm transition";
+                    btnA4.className = "px-3 py-1.5 rounded-lg font-semibold text-emerald-100 hover:text-white transition";
+                }
             }
 
             if (label) label.textContent = paperSize;
@@ -721,7 +843,6 @@
                 return;
             }
 
-            // Mencoba membuka jendela cetak bersih (mengatasi pembatasan sandbox/iframe pratinjau)
             const printWindow = window.open('', '_blank', 'width=900,height=700');
             if (printWindow) {
                 const pageDimensions = paperSize === 'F4' ? '215mm 330mm' : '210mm 297mm';
@@ -730,52 +851,17 @@
                     <html lang="id">
                     <head>
                         <meta charset="UTF-8">
-                        <title>Cetak Kartu Ujian (${paperSize})</title>
+                        <title>Cetak Kartu Ujian ${currentJenjang} (${paperSize})</title>
                         <script src="https://cdn.tailwindcss.com"><\/script>
                         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                         <style>
                             @page { size: ${pageDimensions}; margin: 4mm; }
-                            body {
-                                font-family: 'Inter', sans-serif;
-                                background: #ffffff;
-                                margin: 0;
-                                padding: 0;
-                                -webkit-print-color-adjust: exact !important;
-                                print-color-adjust: exact !important;
-                            }
-                            .paper-sheet {
-                                background: white;
-                                margin: 0 auto;
-                                padding: 2mm 0;
-                                display: grid;
-                                grid-template-columns: repeat(2, 105mm);
-                                gap: 3mm;
-                                justify-content: center;
-                                align-content: start;
-                                page-break-after: always;
-                                break-after: page;
-                            }
-                            .paper-sheet:last-child {
-                                page-break-after: auto;
-                                break-after: auto;
-                            }
-                            .exam-card {
-                                width: 105mm;
-                                height: 75mm;
-                                background: #ffffff;
-                                border: 1.5px solid #000000;
-                                box-sizing: border-box;
-                                position: relative;
-                                overflow: hidden;
-                                display: flex;
-                                flex-direction: column;
-                                justify-content: space-between;
-                                padding: 3.5mm 4mm;
-                                page-break-inside: avoid;
-                                break-inside: avoid;
-                            }
+                            body { font-family: 'Inter', sans-serif; background: #ffffff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                            .exam-card { width: 99mm; height: 75mm; background: #ffffff; border: 1.5px solid #000000 !important; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 3mm 3.5mm; page-break-inside: avoid; break-inside: avoid; }
                             .stamp-multiply { mix-blend-mode: multiply; }
+                            .paper-sheet { background: white; width: 202mm !important; margin: 0 auto !important; padding: 2mm 0 !important; box-sizing: border-box; display: grid; grid-template-columns: repeat(2, 99mm); gap: 3mm; justify-content: center; align-content: start; page-break-after: always; break-after: page; }
+                            .paper-sheet:last-child { page-break-after: auto; break-after: auto; }
                             .no-print { display: none !important; }
                         </style>
                     </head>
@@ -794,7 +880,6 @@
                 `);
                 printWindow.document.close();
             } else {
-                // Fallback jika pop-up diblokir browser
                 window.print();
             }
         }
@@ -815,10 +900,9 @@
             const originalHtml = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>Membuat PDF...</span>`;
-            showToast(`Sedang merender ${filtered.length} kartu ke file PDF (${paperSize})...`, "info");
+            showToast(`Sedang merender ${filtered.length} kartu ${currentJenjang} ke file PDF (${paperSize})...`, "info");
 
             try {
-                // Siapkan kloning bersih tanpa bayangan/margin layar agar pas 100% di kertas PDF
                 const sourceWrapper = document.getElementById('sheets-wrapper');
                 const cloneContainer = document.createElement('div');
                 cloneContainer.style.background = '#ffffff';
@@ -839,20 +923,11 @@
 
                 const pdfFormat = paperSize === 'F4' ? [215, 330] : 'a4';
                 const opt = {
-                    margin: [3, 0, 3, 0],
-                    filename: `Kartu_Ujian_${paperSize}_${new Date().toISOString().slice(0, 10)}.pdf`,
+                    margin: [4, 2, 4, 2],
+                    filename: `Kartu_Ujian_${currentJenjang}_${paperSize}_${new Date().toISOString().slice(0, 10)}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        letterRendering: true,
-                        logging: false
-                    },
-                    jsPDF: {
-                        unit: 'mm',
-                        format: pdfFormat,
-                        orientation: 'portrait'
-                    },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
+                    jsPDF: { unit: 'mm', format: pdfFormat, orientation: 'portrait' },
                     pagebreak: { mode: ['css', 'legacy'] }
                 };
 
@@ -897,7 +972,7 @@
         }
 
         // ==========================================
-        // 4. DOWNLOAD TEMPLATE & IMPORT DATA EXCEL (.XLSX)
+        // 5. DOWNLOAD TEMPLATE & IMPORT EXCEL (.XLSX)
         // ==========================================
         function downloadExcelTemplate() {
             if (typeof XLSX === 'undefined') {
@@ -905,23 +980,43 @@
                 return;
             }
 
-            const sampleRows = [
+            const isMA = currentJenjang === 'MA';
+            const sampleRows = isMA ? [
                 {
-                    "No Peserta": "01-001-001-8",
+                    "No Peserta": "03-001-001-8",
+                    "NISN": "0071234501",
+                    "NIS": "22101",
+                    "Nama Lengkap": "AHMAD ZAKI AL-FATIH",
+                    "Tempat Tanggal Lahir": "Semarang, 10 Februari 2008",
+                    "Kelas": "XII IPA-1",
+                    "Ruang": "Ruang 01"
+                },
+                {
+                    "No Peserta": "03-001-002-7",
+                    "NISN": "0071234502",
+                    "NIS": "22102",
+                    "Nama Lengkap": "FATIMAH AZ-ZAHRA",
+                    "Tempat Tanggal Lahir": "Malang, 18 Juli 2008",
+                    "Kelas": "XII IPS-1",
+                    "Ruang": "Ruang 01"
+                }
+            ] : [
+                {
+                    "No Peserta": "02-001-001-8",
                     "NISN": "0091234501",
                     "NIS": "23001",
                     "Nama Lengkap": "MUHAMMAD RIZKY PRATAMA",
-                    "Tempat Tanggal Lahir": "Jakarta, 14 Maret 2010",
+                    "Tempat Tanggal Lahir": "Jakarta, 14 Maret 2011",
                     "Kelas": "IX-A",
                     "Ruang": "Ruang 01"
                 },
                 {
-                    "No Peserta": "01-001-002-7",
+                    "No Peserta": "02-001-002-7",
                     "NISN": "0091234502",
                     "NIS": "23002",
                     "Nama Lengkap": "AISYAH PUTRI RAMADHANI",
-                    "Tempat Tanggal Lahir": "Bandung, 22 Agustus 2010",
-                    "Kelas": "IX-A",
+                    "Tempat Tanggal Lahir": "Bandung, 22 Agustus 2011",
+                    "Kelas": "IX-B",
                     "Ruang": "Ruang 01"
                 }
             ];
@@ -929,13 +1024,13 @@
             const worksheet = XLSX.utils.json_to_sheet(sampleRows);
             worksheet['!cols'] = [
                 { wch: 16 }, { wch: 14 }, { wch: 10 },
-                { wch: 28 }, { wch: 24 }, { wch: 10 }, { wch: 12 }
+                { wch: 28 }, { wch: 24 }, { wch: 12 }, { wch: 12 }
             ];
 
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Data_Peserta");
-            XLSX.writeFile(workbook, "Template_Kartu_Ujian_V3.xlsx");
-            showToast("Template Excel berhasil diunduh!", "success");
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Data_Peserta_${currentJenjang}`);
+            XLSX.writeFile(workbook, `Template_Kartu_Ujian_${currentJenjang}_V3.xlsx`);
+            showToast(`Template Excel jenjang ${currentJenjang} berhasil diunduh!`, "success");
         }
 
         function handleExcelUpload(event) {
@@ -983,6 +1078,7 @@
                     }).filter(s => s.nama && s.nama !== "");
 
                     students = mappedStudents;
+                    hasCustomUploadedData = true;
                     statusEl.textContent = `Berhasil memuat ${students.length} peserta dari ${file.name}`;
                     statusEl.classList.add('text-emerald-700', 'font-semibold');
 
@@ -1016,20 +1112,16 @@
                 const imagePromises = [];
 
                 zip.forEach((relativePath, zipEntry) => {
-                    // Abaikan folder dan file tersembunyi macOS (__MACOSX)
                     if (zipEntry.dir || relativePath.includes('__MACOSX') || relativePath.startsWith('.')) {
                         return;
                     }
 
-                    // Cek ekstensi gambar
                     if (/\.(jpe?g|png|webp)$/i.test(zipEntry.name)) {
-                        // Ambil nama file saja tanpa folder dan tanpa ekstensi -> sebagai NISN
                         const fileNameOnly = zipEntry.name.split('/').pop();
                         const nisnKey = fileNameOnly.replace(/\.[^/.]+$/, "").trim();
 
                         if (nisnKey) {
                             const promise = zipEntry.async("blob").then(blob => {
-                                // Hapus URL lama jika ada untuk mencegah memory leak
                                 if (photoMap[nisnKey] && photoMap[nisnKey].startsWith('blob:')) {
                                     URL.revokeObjectURL(photoMap[nisnKey]);
                                 }
@@ -1062,10 +1154,10 @@
             students.forEach(s => {
                 if (s.nisn && photoMap[s.nisn]) matched++;
             });
-            document.getElementById('photo-match-badge').textContent = `${matched} / ${students.length} Foto Cocok`;
+            const badge = document.getElementById('photo-match-badge');
+            if (badge) badge.textContent = `${matched} / ${students.length} Foto Cocok`;
         }
 
-        // Upload Foto Satuan (Klik langsung pada kotak foto kartu)
         function triggerSinglePhotoUpload(nisn, index) {
             if (!nisn) {
                 showToast("Siswa ini belum memiliki NISN. Edit data untuk mengisi NISN terlebih dahulu.", "warning");
@@ -1137,6 +1229,7 @@
                 showToast("Data peserta berhasil diperbarui!", "success");
             } else {
                 students.push(studentObj);
+                hasCustomUploadedData = true;
                 showToast("Peserta baru berhasil ditambahkan!", "success");
             }
 
@@ -1157,6 +1250,7 @@
         function clearAllStudents() {
             if (students.length === 0) return;
             students = [];
+            hasCustomUploadedData = true;
             updateClassFilterOptions();
             updatePhotoMatchBadge();
             renderAll();
@@ -1165,6 +1259,7 @@
 
         function updateClassFilterOptions() {
             const select = document.getElementById('filter-kelas');
+            if (!select) return;
             const currentVal = select.value;
             const uniqueClasses = [...new Set(students.map(s => s.kelas).filter(Boolean))].sort();
 
@@ -1200,7 +1295,8 @@
 
         function setAccentColor(hex) {
             config.accentColor = hex;
-            document.getElementById('cfg-color').value = hex;
+            const colorInput = document.getElementById('cfg-color');
+            if (colorInput) colorInput.value = hex;
             renderAll();
         }
 
@@ -1226,18 +1322,25 @@
         }
 
         function syncImagePreviews() {
-            document.getElementById('preview-logo-left').src = config.logoLeft || "https://placehold.co/80x80/f1f5f9/94a3b8?text=Kiri";
-            document.getElementById('preview-logo-right').src = config.logoRight || "https://placehold.co/80x80/f1f5f9/94a3b8?text=Kanan";
-            document.getElementById('preview-ttd').src = config.ttdImg || "https://placehold.co/120x50/f1f5f9/94a3b8?text=TTD";
-            document.getElementById('preview-stempel').src = config.stempelImg || "https://placehold.co/80x80/f1f5f9/94a3b8?text=Cap";
+            const pLeft = document.getElementById('preview-logo-left');
+            const pRight = document.getElementById('preview-logo-right');
+            const pTtd = document.getElementById('preview-ttd');
+            const pStempel = document.getElementById('preview-stempel');
+
+            if (pLeft) pLeft.src = config.logoLeft || "https://placehold.co/80x80/f1f5f9/94a3b8?text=Kiri";
+            if (pRight) pRight.src = config.logoRight || "https://placehold.co/80x80/f1f5f9/94a3b8?text=Kanan";
+            if (pTtd) pTtd.src = config.ttdImg || "https://placehold.co/120x50/f1f5f9/94a3b8?text=TTD";
+            if (pStempel) pStempel.src = config.stempelImg || "https://placehold.co/80x80/f1f5f9/94a3b8?text=Cap";
         }
 
         // ==========================================
         // 9. RENDER DAFTAR MINI & LEMBAR KARTU PRESISI
         // ==========================================
         function getFilteredStudents() {
-            const keyword = document.getElementById('search-student').value.toLowerCase().trim();
-            const selectedKelas = document.getElementById('filter-kelas').value;
+            const searchEl = document.getElementById('search-student');
+            const filterEl = document.getElementById('filter-kelas');
+            const keyword = searchEl ? searchEl.value.toLowerCase().trim() : '';
+            const selectedKelas = filterEl ? filterEl.value : 'ALL';
 
             return students.map((s, originalIndex) => ({ ...s, originalIndex })).filter(s => {
                 const matchKelas = selectedKelas === 'ALL' || s.kelas === selectedKelas;
@@ -1251,45 +1354,51 @@
 
         function renderAll() {
             const filtered = getFilteredStudents();
-            document.getElementById('total-students-count').textContent = students.length;
+            const countEl = document.getElementById('total-students-count');
+            if (countEl) countEl.textContent = students.length;
 
-            // 1. Render List Mini di Sidebar Kiri
             const miniContainer = document.getElementById('student-list-mini');
-            if (filtered.length === 0) {
-                miniContainer.innerHTML = `<div class="p-4 text-center text-slate-400">Tidak ada data peserta yang cocok.</div>`;
-            } else {
-                miniContainer.innerHTML = filtered.map(s => {
-                    const hasPhoto = Boolean(s.nisn && photoMap[s.nisn]);
-                    return `
-                        <div class="px-3 py-2 flex items-center justify-between hover:bg-slate-50 transition">
-                            <div class="min-w-0 pr-2">
-                                <div class="font-bold text-slate-800 truncate">${escapeHtml(s.nama)}</div>
-                                <div class="text-[11px] text-slate-500 flex items-center gap-2">
-                                    <span>NISN: <b>${escapeHtml(s.nisn || '-')}</b></span>
-                                    <span>•</span>
-                                    <span class="text-emerald-700 font-semibold">${escapeHtml(s.kelas)} (${escapeHtml(s.ruang)})</span>
+            if (miniContainer) {
+                if (filtered.length === 0) {
+                    miniContainer.innerHTML = `<div class="p-4 text-center text-slate-400">Tidak ada data peserta yang cocok.</div>`;
+                } else {
+                    miniContainer.innerHTML = filtered.map(s => {
+                        const hasPhoto = Boolean(s.nisn && photoMap[s.nisn]);
+                        return `
+                            <div class="px-3 py-2 flex items-center justify-between hover:bg-slate-50 transition">
+                                <div class="min-w-0 pr-2">
+                                    <div class="font-bold text-slate-800 truncate">${escapeHtml(s.nama)}</div>
+                                    <div class="text-[11px] text-slate-500 flex items-center gap-2">
+                                        <span>NISN: <b>${escapeHtml(s.nisn || '-')}</b></span>
+                                        <span>•</span>
+                                        <span class="text-emerald-700 font-semibold">${escapeHtml(s.kelas)} (${escapeHtml(s.ruang)})</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 flex-shrink-0">
+                                    <span class="w-2 h-2 rounded-full ${hasPhoto ? 'bg-emerald-500' : 'bg-slate-300'}" title="${hasPhoto ? 'Foto Terpasang' : 'Belum Ada Foto'}"></span>
+                                    <button onclick="openStudentModal(${s.originalIndex})" class="p-1.5 text-slate-500 hover:text-blue-600 rounded" title="Edit">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button onclick="deleteStudent(${s.originalIndex})" class="p-1.5 text-slate-500 hover:text-rose-600 rounded" title="Hapus">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-1 flex-shrink-0">
-                                <span class="w-2 h-2 rounded-full ${hasPhoto ? 'bg-emerald-500' : 'bg-slate-300'}" title="${hasPhoto ? 'Foto Terpasang' : 'Belum Ada Foto'}"></span>
-                                <button onclick="openStudentModal(${s.originalIndex})" class="p-1.5 text-slate-500 hover:text-blue-600 rounded" title="Edit">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
-                                <button onclick="deleteStudent(${s.originalIndex})" class="p-1.5 text-slate-500 hover:text-rose-600 rounded" title="Hapus">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                        `;
+                    }).join('');
+                }
             }
 
-            // 2. Render Lembar Kertas (A4 = 6 kartu/lembar, F4 = 8 kartu/lembar)
             const sheetsWrapper = document.getElementById('sheets-wrapper');
+            if (!sheetsWrapper) return;
+
             const cardsPerSheet = paperSize === 'A4' ? 6 : 8;
             const totalPages = Math.max(1, Math.ceil(filtered.length / cardsPerSheet));
 
-            document.getElementById('summary-text').textContent = `${filtered.length} Kartu • ${totalPages} Halaman ${paperSize} (Ukuran Kartu 10,5 x 7,5 cm)`;
+            const summaryEl = document.getElementById('summary-text');
+            if (summaryEl) {
+                summaryEl.textContent = `[Jenjang ${currentJenjang}] ${filtered.length} Kartu • ${totalPages} Halaman ${paperSize} (10,5 x 7,5 cm)`;
+            }
 
             if (filtered.length === 0) {
                 sheetsWrapper.innerHTML = `
@@ -1323,104 +1432,90 @@
 
             return `
                 <div class="exam-card">
-                    <!-- HEADER KOP DUAL LOGO PRESISI -->
-                    <div class="relative flex items-center justify-between border-b-2 border-slate-900 pb-1.5 min-h-[12.5mm]">
-                        <!-- Logo Kiri -->
-                        <div class="w-[11mm] h-[11mm] flex items-center justify-center flex-shrink-0">
+                    <div class="relative flex items-center justify-between border-b-2 border-slate-900 pb-1 min-h-[12mm]">
+                        <div class="w-[10.5mm] h-[10.5mm] flex items-center justify-center flex-shrink-0">
                             ${config.logoLeft ? `<img src="${config.logoLeft}" class="max-w-full max-h-full object-contain" alt="Logo Kiri">` : ''}
                         </div>
-
-                        <!-- Teks Tengah Kop -->
                         <div class="flex-1 text-center px-1 leading-tight">
-                            <div class="text-[7px] font-bold tracking-wide text-slate-700 uppercase">${escapeHtml(config.instansi)}</div>
-                            <div class="text-[9.5px] font-extrabold text-slate-950 uppercase tracking-tight mt-0.5">${escapeHtml(config.sekolah)}</div>
-                            <div class="text-[6.2px] text-slate-600 mt-0.5 line-clamp-1">${escapeHtml(config.alamat)}</div>
+                            <div class="text-[8px] font-bold tracking-wide text-slate-800 uppercase">${escapeHtml(config.instansi)}</div>
+                            <div class="text-[10.5px] font-extrabold text-slate-950 uppercase tracking-tight mt-0.5">${escapeHtml(config.sekolah)}</div>
+                            <div class="text-[7px] text-slate-700 mt-0.5 line-clamp-1">${escapeHtml(config.alamat)}</div>
                         </div>
-
-                        <!-- Logo Kanan -->
-                        <div class="w-[11mm] h-[11mm] flex items-center justify-center flex-shrink-0">
+                        <div class="w-[10.5mm] h-[10.5mm] flex items-center justify-center flex-shrink-0">
                             ${config.logoRight ? `<img src="${config.logoRight}" class="max-w-full max-h-full object-contain" alt="Logo Kanan">` : ''}
                         </div>
                     </div>
 
-                    <!-- PITA JUDUL KARTU -->
                     <div style="background-color: ${config.accentColor};" class="text-white text-center py-0.5 px-2 rounded-sm my-1">
-                        <div class="text-[8.5px] font-extrabold tracking-wider uppercase leading-tight">${escapeHtml(config.judul)}</div>
-                        <div class="text-[6.8px] font-semibold tracking-widest opacity-95 uppercase">${escapeHtml(config.tapel)}</div>
+                        <div class="text-[9.5px] font-extrabold tracking-wider uppercase leading-tight">${escapeHtml(config.judul)}</div>
+                        <div class="text-[7.5px] font-semibold tracking-widest opacity-95 uppercase">${escapeHtml(config.tapel)}</div>
                     </div>
 
-                    <!-- BODY: BIODATA & PASFOTO -->
-                    <div class="flex gap-2.5 items-start flex-1 pt-0.5">
-                        <!-- Kotak Pasfoto 3x4 (Klik untuk ganti satuan) -->
+                    <div class="flex gap-2 items-start flex-1 pt-0.5">
                         <div onclick="triggerSinglePhotoUpload('${escapeHtml(s.nisn)}', ${s.originalIndex})" 
                              title="Klik untuk upload/ganti foto peserta ini"
-                             class="w-[21mm] h-[27mm] border border-slate-800 bg-slate-50 flex-shrink-0 flex flex-col items-center justify-center overflow-hidden cursor-pointer relative group">
+                             class="w-[19.5mm] h-[25.5mm] border border-slate-800 bg-slate-50 flex-shrink-0 flex flex-col items-center justify-center overflow-hidden cursor-pointer relative group">
                             ${photoUrl 
                                 ? `<img src="${photoUrl}" class="w-full h-full object-cover" alt="Foto ${escapeHtml(s.nama)}">` 
                                 : `<div class="text-center p-1 text-slate-400">
                                      <i class="fa-solid fa-user text-lg mb-0.5 block"></i>
-                                     <span class="text-[6px] font-bold block leading-tight">PAS FOTO<br>3 x 4</span>
+                                     <span class="text-[6.5px] font-bold block leading-tight">PAS FOTO<br>3 x 4</span>
                                    </div>`
                             }
-                            <div class="absolute inset-0 bg-black/50 text-white text-[6.5px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition no-print text-center px-1">
+                            <div class="absolute inset-0 bg-black/50 text-white text-[7px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition no-print text-center px-1">
                                 Ganti Foto
                             </div>
                         </div>
 
-                        <!-- Tabel Biodata Peserta -->
-                        <table class="w-full text-[7.8px] leading-[1.32] text-slate-900 border-collapse">
+                        <table class="w-full text-[8.8px] leading-[1.35] text-slate-950 border-collapse">
                             <tr>
-                                <td class="w-[22mm] font-semibold text-slate-700 align-top">No. Peserta</td>
+                                <td class="w-[22.5mm] font-semibold text-slate-800 align-top">No. Peserta</td>
                                 <td class="w-[2.5mm] align-top">:</td>
                                 <td class="font-extrabold text-slate-950 tracking-wide align-top">${escapeHtml(s.nopes)}</td>
                             </tr>
                             <tr>
-                                <td class="font-semibold text-slate-700 align-top">NIS / NISN</td>
+                                <td class="font-semibold text-slate-800 align-top">NIS / NISN</td>
                                 <td class="align-top">:</td>
-                                <td class="font-semibold align-top">${escapeHtml(s.nis)} / ${escapeHtml(s.nisn || '-')}</td>
+                                <td class="font-bold align-top">${escapeHtml(s.nis)} / ${escapeHtml(s.nisn || '-')}</td>
                             </tr>
                             <tr>
-                                <td class="font-semibold text-slate-700 align-top">Nama Lengkap</td>
+                                <td class="font-semibold text-slate-800 align-top">Nama Lengkap</td>
                                 <td class="align-top">:</td>
                                 <td class="font-extrabold uppercase align-top line-clamp-2">${escapeHtml(s.nama)}</td>
                             </tr>
                             <tr>
-                                <td class="font-semibold text-slate-700 align-top">Tempat, Tgl Lahir</td>
+                                <td class="font-semibold text-slate-800 align-top">Tempat, Tgl Lahir</td>
                                 <td class="align-top">:</td>
-                                <td class="align-top truncate max-w-[46mm]">${escapeHtml(s.ttl)}</td>
+                                <td class="align-top truncate max-w-[44mm]">${escapeHtml(s.ttl)}</td>
                             </tr>
                             <tr>
-                                <td class="font-semibold text-slate-700 align-top">Kelas / Ruang</td>
+                                <td class="font-semibold text-slate-800 align-top">Kelas / Ruang</td>
                                 <td class="align-top">:</td>
                                 <td class="align-top">
                                     <span class="font-bold">${escapeHtml(s.kelas)}</span> 
                                     <span class="mx-1 text-slate-400">|</span> 
-                                    <span class="px-1.5 py-0.2 bg-slate-100 border border-slate-400 rounded font-extrabold text-[7.5px]">${escapeHtml(s.ruang)}</span>
+                                    <span class="px-1.5 py-0.2 bg-slate-100 border border-slate-500 rounded font-extrabold text-[8.2px]">${escapeHtml(s.ruang)}</span>
                                 </td>
                             </tr>
                         </table>
                     </div>
 
-                    <!-- FOOTER: CATATAN & TTD + STEMPEL DIGITAL -->
-                    <div class="flex items-end justify-between pt-1 mt-0.5 border-t border-dashed border-slate-300 text-[6.5px]">
-                        <!-- Catatan Kiri -->
-                        <div class="text-slate-600 leading-tight max-w-[52mm] italic">
+                    <div class="flex items-end justify-between pt-1 mt-0.5 border-t border-dashed border-slate-400 text-[7.2px]">
+                        <div class="text-slate-700 leading-tight max-w-[48mm] italic">
                             ${formattedNotes}
                         </div>
 
-                        <!-- Blok Tanda Tangan & Stempel Kanan -->
-                        <div class="relative text-left min-w-[38mm] leading-tight">
-                            <div class="text-slate-800">${escapeHtml(config.tgl)}</div>
-                            <div class="text-slate-800">${escapeHtml(config.jabatan)}</div>
+                        <div class="relative text-left min-w-[39mm] leading-tight">
+                            <div class="text-slate-900 font-medium">${escapeHtml(config.tgl)}</div>
+                            <div class="text-slate-900 font-medium">${escapeHtml(config.jabatan)}</div>
                             
-                            <!-- Area TTD & Stempel -->
-                            <div class="relative h-[8.5mm] my-0.5 flex items-center">
-                                ${config.ttdImg ? `<img src="${config.ttdImg}" class="h-[8.5mm] max-w-[28mm] object-contain relative z-10" alt="TTD">` : ''}
-                                ${config.stempelImg ? `<img src="${config.stempelImg}" class="h-[11.5mm] w-[11.5mm] object-contain absolute -left-2 -top-1.5 z-20 stamp-multiply pointer-events-none" alt="Stempel">` : ''}
+                            <div class="relative h-[8mm] my-0.5 flex items-center">
+                                ${config.ttdImg ? `<img src="${config.ttdImg}" class="h-[8mm] max-w-[28mm] object-contain relative z-10" alt="TTD">` : ''}
+                                ${config.stempelImg ? `<img src="${config.stempelImg}" class="h-[11mm] w-[11mm] object-contain absolute -left-2 -top-1.5 z-20 stamp-multiply pointer-events-none" alt="Stempel">` : ''}
                             </div>
 
                             <div class="font-extrabold text-slate-950 underline">${escapeHtml(config.kamad)}</div>
-                            <div class="text-slate-700 text-[6px]">${escapeHtml(config.nip)}</div>
+                            <div class="text-slate-800 text-[6.8px]">${escapeHtml(config.nip)}</div>
                         </div>
                     </div>
                 </div>
@@ -1429,7 +1524,7 @@
 
         // Helper keamanan anti-XSS
         function escapeHtml(text) {
-            if (!text) return "";
+            if (text === null || text === undefined) return "";
             return String(text)
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
@@ -1437,6 +1532,52 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
+
+        // ==========================================
+        // 10. INISIALISASI APLIKASI & EKSPOS GLOBAL
+        // ==========================================
+        function initApp() {
+            loadProjectFromLocal();
+            syncFormWithConfig();
+            syncImagePreviews();
+            updateJenjangButtonsUI();
+            updateClassFilterOptions();
+            updatePhotoMatchBadge();
+            renderAll();
+        }
+
+        window.applyJenjangPreset = applyJenjangPreset;
+        window.switchTab = switchTab;
+        window.setPaperSize = setPaperSize;
+        window.saveProjectToLocal = saveProjectToLocal;
+        window.exportProjectFile = exportProjectFile;
+        window.importProjectFile = importProjectFile;
+        window.downloadPDF = downloadPDF;
+        window.printCards = printCards;
+        window.downloadExcelTemplate = downloadExcelTemplate;
+        window.handleExcelUpload = handleExcelUpload;
+        window.handleZipUpload = handleZipUpload;
+        window.openStudentModal = openStudentModal;
+        window.closeStudentModal = closeStudentModal;
+        window.saveManualStudent = saveManualStudent;
+        window.deleteStudent = deleteStudent;
+        window.clearAllStudents = clearAllStudents;
+        window.updateConfig = updateConfig;
+        window.setAccentColor = setAccentColor;
+        window.handleImageSetting = handleImageSetting;
+        window.removeImageSetting = removeImageSetting;
+        window.triggerSinglePhotoUpload = triggerSinglePhotoUpload;
+        window.handleSinglePhotoSelected = handleSinglePhotoSelected;
+        window.renderAll = renderAll;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
     </script>
 </body>
 </html>
+```
+
+Error `ReferenceError` telah diperbaiki sepenuhnya dengan mengembalikan blok deklarasi state awal (`paperSize`, `currentJenjang`, `config`, `students`, `photoMap`, `sampleStudentsMTS`, `sampleStudentsMA`) serta fungsi inisialisasi `initApp()` yang terpotong pada pembaruan sebelumnya.
